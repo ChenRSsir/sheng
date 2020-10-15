@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+     <link href="../CSS/Style4.css" rel="stylesheet" type="text/css" />
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="js/jquery.js"></script>
+     <script type="text/javascript">
+        function showMsg() {
+            window.showModalDialog("LostMsg.htm?data=" + Math.random(), "参数", "dialogWidth:550px;dialogHeight:400px;help:no");
+        }
+ </script>
+ <script type="text/javascript">
+     $(function(){
+		//第一次加载，查询所有流失客户
+		$.get('http://localhost:90/findCusLost?pageNum=1&pageSize=2',function(clost){
+			//console.info(clost);
+			//建表
+			cLostTable(clost);
+		});
+		
+		//分页模糊查询
+		 function selectClost(pageNum,pageSize) {
+		 
+		//先清空表中数据
+		$("#myTable :first-child ~tr").empty();
+		 
+		$.ajax({
+			type:"POST",
+			url:"/findCusLost",
+			data:{
+				"pageNum":pageNum,
+				"pageSize":pageSize,
+				"lstCustName":$("#lstCustName").val(),
+				"lstCustManagerName":$("#lstCustManagerName").val(),
+				"lstStatus":$("option:selected").val()
+			},
+			async:true,
+			success:function(clost){
+				//调用创建表格的方法
+				cLostTable(clost);
+			}	
+		});
+	}
+		
+		//将数据存入表中
+     	function cLostTable(clost) {
+ 			$(clost.list).each(function(index,c) {
+ 				//设置行
+ 				var $tr=$("<tr></tr>");
+ 				//设置列
+ 				var $lstCustNoTd=$("<td align='center'>"+c.lstCustNo+"</td>");
+ 				var $lstCustNameTd=$("<td align='center'>"+c.lstCustName+"</td>");
+ 				var $lstCustManagerNameTd=$("<td align='center'>"+c.lstCustManagerName+"</td>");
+ 				var $lstLastOrderDateTd=$("<td align='center'>"+c.lstLastOrderDate+"</td>");
+ 				var $lstLostDateTd=$("<td align='center'>"+c.lstLostDate+"</td>");
+ 				//判断预警是否有值
+ 				var i=0;
+ 				if(c.lstDelay!=null){
+ 					i=1;
+ 				}
+ 				if(c.lstStatus=="1"){
+ 					var $lstStatusTd=$("<td align='center'>预警</td>");
+ 	 				var $ulitTd=$("<td>"+
+ 	 						"<a href='/lstdelay?lid="+c.lstId+"&i=1'><img src='../images/bt_relay.gif' title='暂缓流失' style='border:0px' /></a> "+
+ 	                        "<a onclick='lstReason("+c.lstId+","+i+")'><img src='../images/bt_confirm.gif' title='确认流失' style='border:0px'/></a></td>");
+ 				}else if(c.lstStatus=="2"){
+ 					var $lstStatusTd=$("<td align='center'>暂缓流失</td>");
+ 	 				var $ulitTd=$("<td>"+
+ 	 						"<a href='/lstdelay?lid="+c.lstId+"&i=1'><img src='../images/bt_relay.gif' title='暂缓流失' style='border:0px' /></a> "+
+ 	                        "<a onclick='lstReason("+c.lstId+","+i+")'><img src='../images/bt_confirm.gif' title='确认流失' style='border:0px'/></a></td>");
+ 				}else if(c.lstStatus=="3"){
+ 					var $lstStatusTd=$("<td align='center'>确认流失</td>");
+ 	 				var $ulitTd=$("<td><a href='/lstdelay?lid="+c.lstId+"&i=3'><img src='../images/bt_plan.gif' title='查看' style='border:0px'/></a></td>");
+ 				}
+ 				//将列放入表中
+ 				$tr.append($lstCustNoTd,$lstCustNameTd,$lstCustManagerNameTd,$lstLastOrderDateTd,$lstLostDateTd,$lstStatusTd,$ulitTd);
+ 				//将行放入表中
+ 				$("#myTable").append($tr);
+ 			});
+ 			//获取数据给翻页
+ 			pageUlit(clost);
+ 		}
+		
+     	//翻页
+   	 function pageUlit(pageParam) {
+   		
+   		//设置记录条
+   		$("#leftPage").text("共有"+pageParam.total+"条记录，当前第"+pageParam.pageNum+"/"+pageParam.navigateLastPage+"页");
+   		
+   		//解除绑定
+   		$(":image:eq(0)").unbind("click");
+   		$(":image:eq(1)").unbind("click");
+   		$(":image:eq(2)").unbind("click");
+   		$(":image:eq(3)").unbind("click");
+   		$(":image:eq(4)").unbind("click");
+   		
+   		//首页
+   		$(":image:eq(0)").bind("click",function(){
+   			selectClost(pageParam.navigateFirstPage,pageParam.pageSize);
+   		});
+   		//上一页
+   		$(":image:eq(1)").bind("click",function(){
+   			selectClost(pageParam.prePage,pageParam.pageSize);
+   		});
+   		//下一页
+   		$(":image:eq(2)").bind("click",function(){
+   			if(pageParam.pageNum>=pageParam.pages){
+   				selectClost(pageParam.pages,pageParam.pageSize);
+   			}else{
+   				selectClost(pageParam.nextPage,pageParam.pageSize);
+   			}
+   			
+   		});
+   		//尾页
+   		$(":image:eq(3)").bind("click",function(){
+   			selectClost(pageParam.pages,pageParam.pageSize);
+   		});
+   		//跳转
+   		$(":image:eq(4)").bind("click",function(){
+   			var $page=$("#page").val();
+   			 if($page==""){
+   				selectClost(pageParam.navigateFirstPage,pageParam.pageSize);
+   			 }else if($page>pageParam.pages){
+   				selectClost(pageParam.pages,pageParam.pageSize);
+   			 }else{
+   				selectClost($page,pageParam.pageSize);
+   			 }
+   		});
+   	}
+   	//模糊查询
+   		$("#btn1").click(function(){
+   			selectClost(1,2);
+   		});
+   	
+});
+     //流失
+     function lstReason(lid,i) {
+ 		if(i==0){
+ 			alert("请先进行暂缓流失操作！");
+ 		}else{
+ 		location.href="/lstdelay?lid="+lid+"&i=2";
+ 	}
+     }
+</script>
+</head>
+<body>
+ <div id="desDiv">
+        <span>客户流失管理</span><br />
+        显示即将流失的客户信息，并制定挽救措施
+    </div>
+    <table class="tableEdit">
+        <tr>
+            <th>
+                客户名称：
+            </th>
+            <td>
+                <input type="text" id="lstCustName" name="lstCustName"/>
+            </td>
+            <th>
+                客户经理：
+            </th>
+            <td>
+                <input type="text" id="lstCustManagerName" name="lstCustManagerName"/>
+            </td>
+            <th>
+                状态：
+            </th>
+            <td>
+                <select id="lstStatus">
+                    <option value="" selected="selected">全部</option>
+                    <option value="1">预警</option>
+                    <option value="2">暂缓流失</option>
+                    <option value="3">确认流失</option>
+                </select>
+            </td>
+        </tr>
+        <tfoot>
+            <tr>
+                <td colspan="8">
+                    <input type="button" value="查询" id="btn1" />
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <div style="width: 1065px">
+        <div>
+            <table class="dataTable" id="myTable">
+                <tr>
+                    <th>
+                        客户编号
+                    </th>
+                    <th>
+                        客户名称
+                    </th>
+                    <th>
+                        客户经理
+                    </th>
+                    <th>
+                        最后下单时间
+                    </th>
+                    <th>
+                        确认流失时间
+                    </th>
+                    <th>
+                        状态
+                    </th>
+                    <th>
+                        操作
+                    </th>
+                </tr>
+            </table>
+            <div id="pageDiv">
+                <div id="leftPage">
+                    共有120条记录，当前第1/10页</div>
+                <div id="rightPage">
+                    <input type="image" src="../images/first.gif" />&nbsp;&nbsp;
+                    <input type="image" src="../images/back.gif" />&nbsp;&nbsp;
+                    <input type="image" src="../images/next.gif" />&nbsp;&nbsp;
+                    <input type="image" src="../images/last.gif" />&nbsp;&nbsp; 转到第<input type="text"
+                    id="page" size="1" />&nbsp;&nbsp;<input type="image" src="../images/go.gif" />
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

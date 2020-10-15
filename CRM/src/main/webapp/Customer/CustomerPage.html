@@ -1,0 +1,230 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <link href="../CSS/Style4.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript">
+     $(function(){
+		//第一次加载
+    	 $.get('http://localhost:90/selectCus?pageNum=1&pageSize=3&custLevel=0',function(cus){
+    		 //console.info(cus);
+    		 customerTable(cus);
+    	 });
+		
+    	//查询
+    	 function selectCusChance(pageNum,pageSize) {
+    		 
+    		//先清空表中数据
+     		$("#myTable :first-child ~tr").empty();
+    		 
+			$.ajax({
+				type:"POST",
+				url:"/selectCus",
+				data:{
+					"pageNum":pageNum,
+					"pageSize":pageSize,
+					"custName":$("#custName").val(),
+					"custNo":$("#custNo").val(),
+					"custRegion":$("#custRegion").val(),
+					"custManagerName":$("#custManagerName").val(),
+					"custLevel":$("#custLevel").val(),
+				},
+				async:true,
+				success:function(cus){
+					//调用创建表格的方法
+					customerTable(cus);
+				}
+				
+			});
+		}
+		
+    	 //将数据存入表中
+     	function customerTable(cus) {
+ 			$(cus.list).each(function(index,c) {
+ 				//设置行
+ 				var $tr=$("<tr></tr>");
+ 				//设置列
+ 				var $custNoTd=$("<td align='center'>"+c.custNo+"</td>");
+ 				var $custNameTd=$("<td align='center'>"+c.custName+"</td>");
+ 				var $custRegionTd=$("<td align='center'>"+c.custRegion+"</td>");
+ 				var $custManagerNameTd=$("<td align='center'>"+c.custManagerName+"</td>");
+ 				var $custLevelTd=$("<td align='center'>"+c.baseDict.dictItem+"</td>");
+ 				var $custCreateDateTd=$("<td align='center'>"+c.custCreateDate+"</td>");
+ 				var $ulitTd=$("<td>"+
+                        "<a href='/findCusById/"+c.custNo+"'><img src='../images/33.gif' title='编辑' style='border:0px' /></a> " +
+                        "<a href='/findLinkMan/"+c.custNo+"'><img src='../images/bt_linkman.gif' title='联系人' style='border:0px;width:16px;height:16px' /></a> "+
+                        "<a href='/findActList/"+c.custNo+"'><img src='../images/bt_acti.gif' title='交往记录' style='border:0px' /></a> " +
+                        "<a href='/findOrdByCus?custNo="+c.custNo+"'><img src='../images/bt_orders.gif' title='历史订单' style='border:0px' /></a> " +
+                        "<img onclick=deleteCus('"+c.custNo+"') src='../images/bt_del.gif' title='删除' style='border:0px' /></td>");
+
+ 				//将列放入表中
+ 				$tr.append($custNoTd,$custNameTd,$custRegionTd,$custManagerNameTd,$custLevelTd,$custCreateDateTd,$ulitTd);
+ 				//将行放入表中
+ 				$("#myTable").append($tr);
+ 			});
+ 			//获取数据给翻页
+ 			pageUlit(cus);
+ 		}
+     	//翻页
+   	 function pageUlit(pageParam) {
+			
+   		//设置记录条
+			$("#leftPage").text("共有"+pageParam.total+"条记录，当前第"+pageParam.pageNum+"/"+pageParam.navigateLastPage+"页");
+   		
+			//解除绑定
+			$(":image:eq(0)").unbind("click");
+			$(":image:eq(1)").unbind("click");
+			$(":image:eq(2)").unbind("click");
+			$(":image:eq(3)").unbind("click");
+			$(":image:eq(4)").unbind("click");
+			
+			//首页
+			$(":image:eq(0)").bind("click",function(){
+				selectCusChance(pageParam.navigateFirstPage,pageParam.pageSize);
+			});
+			//上一页
+			$(":image:eq(1)").bind("click",function(){
+				selectCusChance(pageParam.prePage,pageParam.pageSize);
+			});
+			//下一页
+			$(":image:eq(2)").bind("click",function(){
+				if(pageParam.pageNum>=pageParam.pages){
+					selectCusChance(pageParam.pages,pageParam.pageSize);
+				}else{
+					selectCusChance(pageParam.nextPage,pageParam.pageSize);
+				}
+				
+			});
+			//尾页
+			$(":image:eq(3)").bind("click",function(){
+				selectCusChance(pageParam.pages,pageParam.pageSize);
+			});
+			//跳转
+			$(":image:eq(4)").bind("click",function(){
+				var $page=$("#page").val();
+				 if($page==""){
+					 selectCusChance(pageParam.navigateFirstPage,pageParam.pageSize);
+				 }else if($page>pageParam.pages){
+					 selectCusChance(pageParam.pages,pageParam.pageSize);
+				 }else{
+					 selectCusChance($page,pageParam.pageSize);
+				 }
+			});
+		}
+   //模糊查询
+		$("#btn1").click(function(){
+			selectCusChance(1,3);
+		});
+	});
+     //删除
+     function deleteCus(cusId) {
+ 		if(confirm("确定删除？")){
+ 			$.get('/deleteCus?cusId='+cusId,function(falg){
+ 				if(falg=="true"){
+ 					alert("删除成功！");
+ 					location.href="/selCustomer";
+ 				}else{
+ 					alert("删除失败！");
+ 				}
+ 			});
+ 		}
+ 	}
+    </script>
+</head>
+<body>
+    <div id="desDiv">
+        <span>客户信息管理</span><br />
+        维护客户信息，记录客户联系电话和交往记录
+    </div>
+    <table class="tableEdit">
+        <tr>
+            <th>
+                客户名称：
+            </th>
+            <td>
+                <input type="text" id="custName" name="custName" />
+            </td>
+            <th>
+                客户编号：
+            </th>
+            <td>
+                <input type="text" id="custNo"  name="custNo"/>
+            </td>
+            <th>
+                地区：
+            </th>
+            <td>
+                <select id="custRegion" name="custRegion">
+                    <option selected="selected" value="">全部</option>
+                    <option th:each="r,stat:${session.regionList}" th:value="${r.dictItem}">[[${r.dictItem}]]</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                客户经理：
+            </th>
+            <td>
+                <input type="text" id="custManagerName" name="custManagerName" />
+            </td>
+            <th>
+                客户等级：
+            </th>
+            <td>
+                <select  id="custLevel" name="custLevel">
+                    <option selected="selected" value="0">全部</option>
+                    <option th:each="l,stat:${session.levelList}" th:value="${l.dictId}">[[${l.dictItem}]]</option>
+                </select>
+            </td>
+            <th></th><td></td>
+        </tr>
+        <tfoot>
+            <tr>
+                <td colspan="8">
+                    <input type="button" value="查询" id="btn1" />
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <br />
+            <table class="dataTable" id="myTable">
+                <tr>
+                    <th>
+                        客户编号
+                    </th>
+                    <th>
+                        客户名称
+                    </th>
+                    <th>
+                        地区
+                    </th>
+                    <th>
+                        客户经理
+                    </th>
+                    <th>
+                        客户等级
+                    </th>
+                    <th>
+                        建立时间
+                    </th>
+                    <th>
+                        操作
+                    </th>
+                </tr>
+        
+            </table>
+            <div id="pageDiv">
+                <div id="leftPage">
+                    共有120条记录，当前第1/10页</div>
+                <div id="rightPage">
+                    <input type="image" src="../images/first.gif" />&nbsp;&nbsp;
+                    <input type="image" src="../images/back.gif" />&nbsp;&nbsp;
+                    <input type="image" src="../images/next.gif" />&nbsp;&nbsp;
+                    <input type="image" src="../images/last.gif" />&nbsp;&nbsp; 转到第
+                    <input type="text" id="page"  size="1" />&nbsp;&nbsp;<input type="image" src="../images/go.gif" />
+                </div>
+            </div>
+</body>
+</html>

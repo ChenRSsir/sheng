@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link href="../CSS/Style1.css" rel="stylesheet" type="text/css" />
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+     function deleteAtv(atvid) {
+    	 if(confirm("确定删除？")){
+ 			location.href="/deleteAtv?atvid="+atvid;
+ 		}
+	}
+    </script>
+</head>
+<body>
+<div id="desDiv">
+    <span>客户交往记录</span><br />
+    记录与客户之间的交往信息
+</div>
+    <table class="tableEdit">
+        <tr>
+            <th>
+                客户编号：
+            </th>
+            <td>
+                [[${session.c.custNo}]]
+            </td>
+            <th>
+                客户名称：
+            </th>
+            <td>
+                [[${session.c.custName}]]
+            </td>
+        </tr>
+    </table>
+<div id="dataDiv">
+    <div id="headDiv">
+        <img src="../images/22.gif" />&nbsp;&nbsp;<a href="/addAtv">新建</a>
+    </div>
+    <table class="dataTable">
+                        <tr>
+                            <th>
+                                时间
+                            </th>
+                            <th>
+                                地点
+                            </th>
+                            <th>
+                                概要
+                            </th>
+                            <th>
+                                详细信息
+                            </th>
+                            <th>
+                                操作
+                            </th>
+                        </tr>
+                        <tr th:each="avt,stat:${actList}">
+                            <td th:text="${#dates.format(avt.atvDate,'yyyy-MM-dd')}">
+                            </td>
+                            <td>
+                               [[${avt.atvPlace}]] 
+                            </td>
+                            <td>
+                               [[${avt.atvTitle}]] 
+                            </td>
+                            <td>
+                                [[${avt.atvDesc}]] 
+                            </td>
+                            <td>
+                            <a th:href=@{'/findAtvById/'+${avt.atvId}}><img title="编辑" src="../images/33.gif" style="border:0px"/></a>&nbsp;
+                            <img th:onclick="deleteAtv([[${avt.atvId}]])" title="删除" src="../images/11.gif" />
+                            </td>
+                        </tr>
+                    </table>
+    </div>
+</body>
+</html>

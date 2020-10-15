@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link href="../CSS/Style1.css" rel="stylesheet" type="text/css" />
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript">
+      $(function(){
+    	//第一次加载
+  		$.get("http://localhost:90/findCusService?pageNum=1&pageSize=3&svrStatus=3",function(cs){
+  			//console.info(cs);
+  			//建表
+  			csTable(cs);
+  		});
+    	
+  	     //查询
+		 function selectCusService(pageNum,pageSize) {
+			 
+			//先清空表中数据
+			$("#myTable :first-child ~tr").empty();
+			 
+			$.ajax({
+				type:"POST",
+				url:"/findCusService",
+				data:{
+					"pageNum":pageNum,
+					"pageSize":pageSize,
+					"svrCustName":$("#svrCustName").val(),
+					"svrTitle":$("#svrTitle").val(),
+					"svrType":$("#svrType>option:selected").val(),
+					"bDate1":$("#bDate1").val(),
+					"bDate2":$("#bDate2").val(),
+					"svrStatus":$("#svrStatus>option:selected").val()
+				},
+				async:true,
+				success:function(cs){
+					//调用创建表格的方法
+					csTable(cs);
+				}
+				
+			});
+		}
+   	
+		//建表储存数据
+		function csTable(cs) {
+			$(cs[0].list).each(function(index,c) {
+				//创建一行
+				var $tr=$("<tr></tr>");
+				//创建列
+				var $svrCustNameTd=$("<td align='center'>"+c.svrCustName+"</td>");
+				var $svrTitleTd=$("<td align='center'>"+c.svrTitle+"</td>");
+				var $svrTypeTd=$("<td align='center'>"+c.svrType+"</td>");
+				var $svrCreateDateTd=$("<td align='center'>"+c.svrCreateDate+"</td>");
+				var $svrDueToTd=$("<td align='center'>"+c.svrDueTo+"</td>");
+				var $svrDueDateTd=$("<td align='center'>"+c.svrDueDate+"</td>");
+				var $ulitTd=$("<td align='center'><a href='/SelSvrDealById?csId="+c.svrId+"&is=2'><img src='../images/bt_feedback.gif' style='border:0px' /></a></td>");
+				//将列放入行中
+				$tr.append($svrCustNameTd,$svrTitleTd,$svrTypeTd,$svrCreateDateTd,$svrDueToTd,$svrDueDateTd,$ulitTd);
+				//将行放入表
+				$("#myTable").append($tr);
+			});
+			pageUlit(cs[0]);
+		}
+   	
+		 //翻页
+		 function pageUlit(pageParam) {
+			
+			//设置记录条
+			$("#leftPage").text("共有"+pageParam.total+"条记录，当前第"+pageParam.pageNum+"/"+pageParam.navigateLastPage+"页");
+			
+			//解除绑定
+			$(":image:eq(0)").unbind("click");
+			$(":image:eq(1)").unbind("click");
+			$(":image:eq(2)").unbind("click");
+			$(":image:eq(3)").unbind("click");
+			$(":image:eq(4)").unbind("click");
+			
+			//首页
+			$(":image:eq(0)").bind("click",function(){
+				selectCusService(pageParam.navigateFirstPage,pageParam.pageSize);
+			});
+			//上一页
+			$(":image:eq(1)").bind("click",function(){
+				selectCusService(pageParam.prePage,pageParam.pageSize);
+			});
+			//下一页
+			$(":image:eq(2)").bind("click",function(){
+				if(pageParam.pageNum>=pageParam.pages){
+					selectCusService(pageParam.pages,pageParam.pageSize);
+				}else{
+					selectCusService(pageParam.nextPage,pageParam.pageSize);
+				}
+				
+			});
+			//尾页
+			$(":image:eq(3)").bind("click",function(){
+				selectCusService(pageParam.pages,pageParam.pageSize);
+			});
+			//跳转
+			$(":image:eq(4)").bind("click",function(){
+				var $page=$("#page").val();
+				 if($page==""){
+					 selectCusService(pageParam.navigateFirstPage,pageParam.pageSize);
+				 }else if($page>pageParam.pages){
+					 selectCusService(pageParam.pages,pageParam.pageSize);
+				 }else{
+					 selectCusService($page,pageParam.pageSize);
+				 }
+			});
+		}
+		//模糊查询
+			$("#btn1").click(function(){
+				selectCusService(1,3);
+			});
+	});
+    </script>
+</head>
+<body>
+<div id="desDiv">
+    <span>服务反馈</span><br />
+    对于客户提出的咨询、建议、投诉等服务进行处理完毕后，记录客户对服务的结果的满意度等
+</div>
+    <table class="tableEdit">
+        <tr>
+            <th>
+                客户名称：
+            </th>
+            <td>
+                <input type="text" name="svrCustName" id="svrCustName" />
+            </td>
+            <th>
+                概要：
+            </th>
+            <td>
+                <input type="text" name="svrTitle" id="svrTitle"/>
+            </td>
+            <th>
+                服务类型：
+            </th>
+            <td>
+                <select id="svrType" name="svrType">
+                    <option selected="selected" value="">全部</option>
+                   <option th:each="d,stat:${session.itemlist}" th:value="${d.dictItem}" th:text="${d.dictItem}"></option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                创建日期：
+            </th>
+            <td colspan="3">
+                <input type="date" id="bDate1" name="bDate1" />&nbsp;-&nbsp;<input type="date" id="bDate2" name="bDate2" />
+            </td>
+            <th>
+                状态：
+            </th>
+            <td>
+                <select id="svrStatus" name="svrStatus">
+                    <option selected="selected" value="3">已处理</option>
+                </select>
+            </td>
+        </tr>
+        <tfoot>
+            <tr>
+                <td colspan="8">
+                    <input type="button" value="查询" id="btn1"/>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+<div id="dataDiv">
+    <div id="headDiv">
+    </div>
+    <table class="dataTable" id="myTable">
+        <tr>
+            <th>客户名称</th>
+            <th>概要</th>
+            <th>服务类型</th>
+            <th>创建时间</th>
+            <th>分配人</th>
+            <th>分配时间</th>
+            <th>处理</th>
+        </tr>
+    </table>
+    <div id="pageDiv">
+        <div id="leftPage">共有120条记录，当前第1/10页</div>
+        <div id="rightPage">
+            <input type="image" src="../images/first.gif" />&nbsp;&nbsp;
+            <input type="image" src="../images/back.gif" />&nbsp;&nbsp;
+            <input type="image" src="../images/next.gif" />&nbsp;&nbsp;
+            <input type="image" src="../images/last.gif" />&nbsp;&nbsp;
+            转到第<input type="text" id="page" size="1" />&nbsp;&nbsp;<input type="image" src="../images/go.gif" />
+        </div>
+    </div>
+</div>
+</body>
+</html>

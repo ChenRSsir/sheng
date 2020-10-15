@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.mapper.OrdersMapper">
+	<resultMap id="BaseResultMap" type="com.turing.entity.Orders">
+		<id column="odr_id" jdbcType="INTEGER" property="odrId" />
+		<result column="odr_customer" jdbcType="VARCHAR" property="odrCustomer" />
+		<result column="odr_date" jdbcType="DATE" property="odrDate" />
+		<result column="odr_addr" jdbcType="VARCHAR" property="odrAddr" />
+		<result column="odr_status" jdbcType="VARCHAR" property="odrStatus" />
+		<result column="totalPrice" jdbcType="INTEGER" property="totalPrice" />
+	</resultMap>
+	<sql id="Example_Where_Clause">
+		<where>
+			<foreach collection="oredCriteria" item="criteria" separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" prefixOverrides="and" suffix=")">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach close=")" collection="criterion.value" item="listItem"
+										open="(" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Update_By_Example_Where_Clause">
+		<where>
+			<foreach collection="example.oredCriteria" item="criteria"
+				separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" prefixOverrides="and" suffix=")">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach close=")" collection="criterion.value" item="listItem"
+										open="(" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Base_Column_List">
+		odr_id, odr_customer, odr_date, odr_addr, odr_status
+	</sql>
+	<select id="selectByExample" parameterType="com.turing.entity.OrdersExample"
+		resultMap="BaseResultMap">
+		select
+		<if test="distinct">
+			distinct
+		</if>
+		<include refid="Base_Column_List" />
+		from orders
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">
+			order by ${orderByClause}
+		</if>
+	</select>
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from orders
+		where odr_id = #{odrId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from orders
+		where odr_id = #{odrId,jdbcType=INTEGER}
+	</delete>
+	<delete id="deleteByExample" parameterType="com.turing.entity.OrdersExample">
+		delete from orders
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</delete>
+	<insert id="insert" parameterType="com.turing.entity.Orders">
+		insert into orders (odr_id,
+		odr_customer, odr_date,
+		odr_addr, odr_status)
+		values
+		(#{odrId,jdbcType=INTEGER}, #{odrCustomer,jdbcType=VARCHAR},
+		#{odrDate,jdbcType=DATE},
+		#{odrAddr,jdbcType=VARCHAR},
+		#{odrStatus,jdbcType=VARCHAR})
+	</insert>
+	<insert id="insertSelective" parameterType="com.turing.entity.Orders">
+		insert into orders
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="odrId != null">
+				odr_id,
+			</if>
+			<if test="odrCustomer != null">
+				odr_customer,
+			</if>
+			<if test="odrDate != null">
+				odr_date,
+			</if>
+			<if test="odrAddr != null">
+				odr_addr,
+			</if>
+			<if test="odrStatus != null">
+				odr_status,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="odrId != null">
+				#{odrId,jdbcType=INTEGER},
+			</if>
+			<if test="odrCustomer != null">
+				#{odrCustomer,jdbcType=VARCHAR},
+			</if>
+			<if test="odrDate != null">
+				#{odrDate,jdbcType=DATE},
+			</if>
+			<if test="odrAddr != null">
+				#{odrAddr,jdbcType=VARCHAR},
+			</if>
+			<if test="odrStatus != null">
+				#{odrStatus,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<select id="countByExample" parameterType="com.turing.entity.OrdersExample"
+		resultType="java.lang.Long">
+		select count(*) from orders
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</select>
+	<update id="updateByExampleSelective" parameterType="map">
+		update orders
+		<set>
+			<if test="record.odrId != null">
+				odr_id = #{record.odrId,jdbcType=INTEGER},
+			</if>
+			<if test="record.odrCustomer != null">
+				odr_customer = #{record.odrCustomer,jdbcType=VARCHAR},
+			</if>
+			<if test="record.odrDate != null">
+				odr_date = #{record.odrDate,jdbcType=DATE},
+			</if>
+			<if test="record.odrAddr != null">
+				odr_addr = #{record.odrAddr,jdbcType=VARCHAR},
+			</if>
+			<if test="record.odrStatus != null">
+				odr_status = #{record.odrStatus,jdbcType=VARCHAR},
+			</if>
+		</set>
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByExample" parameterType="map">
+		update orders
+		set odr_id = #{record.odrId,jdbcType=INTEGER},
+		odr_customer = #{record.odrCustomer,jdbcType=VARCHAR},
+		odr_date =
+		#{record.odrDate,jdbcType=DATE},
+		odr_addr =
+		#{record.odrAddr,jdbcType=VARCHAR},
+		odr_status =
+		#{record.odrStatus,jdbcType=VARCHAR}
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByPrimaryKeySelective" parameterType="com.turing.entity.Orders">
+		update orders
+		<set>
+			<if test="odrCustomer != null">
+				odr_customer = #{odrCustomer,jdbcType=VARCHAR},
+			</if>
+			<if test="odrDate != null">
+				odr_date = #{odrDate,jdbcType=DATE},
+			</if>
+			<if test="odrAddr != null">
+				odr_addr = #{odrAddr,jdbcType=VARCHAR},
+			</if>
+			<if test="odrStatus != null">
+				odr_status = #{odrStatus,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where odr_id = #{odrId,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.turing.entity.Orders">
+		update orders
+		set
+		odr_customer = #{odrCustomer,jdbcType=VARCHAR},
+		odr_date =
+		#{odrDate,jdbcType=DATE},
+		odr_addr = #{odrAddr,jdbcType=VARCHAR},
+		odr_status = #{odrStatus,jdbcType=VARCHAR}
+		where odr_id =
+		#{odrId,jdbcType=INTEGER}
+	</update>
+	<select id="selectByExampleWithRowbounds" parameterType="com.turing.entity.OrdersExample"
+		resultMap="BaseResultMap">
+		select
+		<if test="distinct">
+			distinct
+		</if>
+		<include refid="Base_Column_List" />
+		from orders
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">
+			order by ${orderByClause}
+		</if>
+	</select>
+	<!-- 6个月没下单的客户 -->
+	<select id="findOrderTime" resultType="java.lang.String">
+		select odr_customer from
+		orders
+		where odr_customer=#{odrCustomer}
+		GROUP BY odr_customer
+		HAVING
+		TIMESTAMPDIFF(MONTH,MAX(odr_date),NOW())>6
+	</select>
+	<!-- 当前客户上次的购买日期 -->
+	<select id="findMaxOrderTime" resultType="java.lang.String">
+		select MAX(odr_date)
+		from orders
+		where odr_customer=#{odrCustomer}
+	</select>
+
+	<!-- 订单总价 -->
+	<select id="findOrderTotal" resultMap="BaseResultMap">
+		SELECT o.odr_customer,SUM(odd_count*odd_price) totalPrice from
+		orders
+		o,orders_line l
+		where o.odr_id=l.odd_order_id
+		and o.odr_customer LIKE #{customer}
+		<if test="dateTime!=null">
+		and DATE_FORMAT(o.odr_date,'%Y')=#{dateTime}
+		</if>
+		GROUP BY o.odr_customer
+		ORDER BY SUM(odd_count*odd_price) DESC;
+	</select>
+</mapper>

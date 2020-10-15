@@ -1,0 +1,166 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link href="../CSS/Style1.css" rel="stylesheet" type="text/css" />
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript">
+      $(function(){
+    	//第一次加载时
+		$.get('http://localhost:90/findPro?pageNum=1&pageSize=3',function(products){
+			console.info(products);
+			ProductTable(products);
+		});
+    	//查询
+		function selectPro(pageNum,pageSize) {	
+    		
+    		//先清空表中数据
+    		$("#myTable :first-child ~tr").empty();
+    		
+			$.ajax({
+				type:"POST",
+				url:"/findPro",
+				data:{
+					"pageNum":pageNum,
+					"pageSize":pageSize,
+					"prodName":$("#prodName").val(),
+					"prodType":$("#prodType").val(),
+					"prodBatch":$("#prodBatch").val()
+				},
+				async:true,
+				success:function(products){
+					//调用创建表格的方法
+					ProductTable(products);
+				}	
+			});
+			}
+		//建表储存数据
+		function ProductTable(products) {
+			$(products.list).each(function(index,pro) {
+				//创建一行
+				var $tr=$("<tr></tr>");
+				//创建列
+				//名称
+				var $prodNameTd=$("<td align='center'>"+pro.prodName+"</td>");
+				//型号
+				var $prodTypeTd=$("<td align='center'>"+pro.prodType+"</td>");
+				//批次
+				var $prodBatchTd=$("<td align='center'>"+pro.prodBatch+"</td>");
+				//单位
+				var $prodUnitTd=$("<td align='center'>"+pro.prodUnit+"</td>");
+				//单价
+				var $prodPriceTd=$("<td align='center'>"+pro.prodPrice+"</td>");
+				//备注 非空判断
+				var $prodMemoTd;
+				if(pro.prodMemo==null){
+					$prodMemoTd=$("<td align='center'></td>");
+				}else{
+					$prodMemoTd=$("<td align='center'>"+pro.prodMemo+"</td>");
+				}
+				//将列放入行中
+				$tr.append($prodNameTd,$prodTypeTd,$prodBatchTd,$prodUnitTd,$prodPriceTd,$prodMemoTd);
+				//将行放入表
+				$("#myTable").append($tr);
+			});
+			pageUlit(products);
+		}
+
+    	//设置页数及其他参数
+    	function pageUlit(pageParam) {
+			//设置记录条
+			$("#leftPage").text("共有"+pageParam.total+"条记录，当前第"+pageParam.pageNum+"/"+pageParam.navigateLastPage+"页");
+			
+			//解除绑定
+			$(":image:eq(0)").unbind("click");
+			$(":image:eq(1)").unbind("click");
+			$(":image:eq(2)").unbind("click");
+			$(":image:eq(3)").unbind("click");
+			$(":image:eq(4)").unbind("click");
+			
+			
+			//首页
+			$(":image:eq(0)").bind("click",function(){
+				selectPro(pageParam.navigateFirstPage,pageParam.pageSize);
+			});
+			//上一页
+			$(":image:eq(1)").bind("click",function(){
+				selectPro(pageParam.prePage,pageParam.pageSize);
+			});
+			//下一页
+			$(":image:eq(2)").bind("click",function(){
+				if(pageParam.pageNum>=pageParam.pages){
+					selectPro(pageParam.pages,pageParam.pageSize);
+				}else{
+					selectPro(pageParam.nextPage,pageParam.pageSize);
+				}
+				
+			});
+			//尾页
+			$(":image:eq(3)").bind("click",function(){
+				selectPro(pageParam.pages,pageParam.pageSize);
+			});
+			//跳转
+			$(":image:eq(4)").bind("click",function(){
+				var $page=$("#page").val();
+				 if($page==""){
+					selectPro(pageParam.navigateFirstPage,pageParam.pageSize);
+				 }else if($page>pageParam.pages){
+					 selectPro(pageParam.pages,pageParam.pageSize);
+				 }else{
+					 selectPro($page,pageParam.pageSize);
+				 }
+			});
+	    }
+    	//模糊查询
+    	$("#btn1").click(function() {
+    		selectPro(1,3);
+		});
+	});
+      
+     
+    </script>
+</head>
+<body>
+    <div id="desDiv">
+        <span>产品查询</span><br />
+        查询产品信息
+    </div>
+    <table class="tableEdit" >
+        <tr>
+            <th>产品名称：</th>
+            <td><input type="text" id="prodName"/></td>
+            <th>型号：</th>
+            <td><input type="text"  id="prodType"/></td>
+            <th>批次：</th>
+            <td><input type="text" id="prodBatch" /></td>
+        </tr>
+        <tfoot>
+            <tr>
+                <td colspan="8"><input type="button" value="查询" id="btn1" /></td>
+            </tr>
+        </tfoot>
+    </table>
+    <br />
+        <table class="dataTable" id="myTable">
+            <tr>
+                <th>产品名称</th>
+                <th>型号</th>
+                <th>等级/批次</th>
+                <th>单位</th>
+                <th>单价(元)</th>
+                <th>备注</th>
+            </tr>
+        </table>
+        <div id="pageDiv">
+            <div id="leftPage"></div>
+            <div id="rightPage">
+                <input type="image"  src="../images/first.gif" />&nbsp;&nbsp;
+                <input type="image"  src="../images/back.gif" />&nbsp;&nbsp;
+                <input type="image"  src="../images/next.gif" />&nbsp;&nbsp;
+                <input type="image"  src="../images/last.gif" />&nbsp;&nbsp;
+                转到第<input type="text" size="1" id="page" />&nbsp;&nbsp;<input type="image" src="../images/go.gif" />
+            </div>
+        </div>
+</body>
+</html>

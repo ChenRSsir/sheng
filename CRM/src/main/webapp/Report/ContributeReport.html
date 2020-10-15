@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <link href="../CSS/Style1.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <div id="desDiv">
+        <span>客户贡献分析</span><br />
+        查看客户的销售总金额（从高到低排序）
+    </div>
+<form action="/findOrderTotal" method="post">  
+    <table class="tableEdit">
+        <tr>
+            <th>
+                客户名称：
+            </th>
+            <td>
+                <input type="text" id="customer" name="customer"/>
+            </td>
+            <th>
+                年份：
+            </th>
+            <td>
+                <select id="dateTime" name="dateTime">
+                    <option selected="selected" value="">全部</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                </select>（说明：最近5年）
+            </td>
+        </tr>
+        <tfoot>
+            <tr>
+                <td colspan="8">
+                    <input type="submit" value="查询" />
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+ </form>     
+    <table class="dataTable">
+        <tr>
+            <th>序号</th>
+            <th>客户姓名</th>
+            <th>订单金额(元)</th>
+        </tr>
+        <tr th:each="o,stat:${total}">
+            <td>[[${stat.index+1}]]</td>
+            <td>[[${o.odrCustomer}]]</td>
+            <td>[[${o.totalPrice}]]</td>
+        </tr>
+    </table>
+</body>
+</html>

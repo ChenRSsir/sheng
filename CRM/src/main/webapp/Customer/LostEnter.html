@@ -1,0 +1,81 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript">
+      $(function() {
+    	  $("#btn2").click(function(){
+  			location.href="/findCl";
+  		});
+    	  
+    	  $("#btn1").click(function(){
+              if($("textarea").val()==""){
+              	alert("流失原因不能为空！");
+              	return false;
+              }
+  			$.ajax({
+  				type:"POST",
+  				url:"/updateLost",
+  				data:{
+  					"lstId":[[${cstLost.lstId}]],
+  			        "lstReason":$("#lstReason").val(),
+  			        "lstStatus":"3"
+  				},
+  				async:true,
+  				success:function(falg){
+  					if(falg=="true"){
+  						alert("操作成功！");
+  						location.href="/findCl";
+  					}else{
+  						alert("操作失败！");
+  					}
+  				}	
+  			});
+  		});
+	});
+    </script>
+</head>
+<body>
+    <table class="tableEdit">
+        <thead>
+            <tr>
+                <td colspan="4">确认流失</td>
+            </tr>
+        </thead>
+        <tr>
+            <th>客户编号：</th>
+            <td>
+                [[${cstLost.lstCustNo}]]
+            </td>
+            <th>客户姓名：</th>
+            <td>[[${cstLost.lstCustName}]]</td>
+        </tr>
+        <tr>
+            <th>客户经理：</th>
+            <td>[[${cstLost.lstCustManagerName}]]</td>
+            <th>最后下单时间：</th>
+            <td th:text="${#dates.format(cstLost.lstLastOrderDate,'yyyy-MM-dd')}"></td>
+        </tr>
+        <tr>
+            <th>暂缓措施：</th>
+            <td colspan="3">
+                 [[${cstLost.lstDelay}]] 
+            </td>
+        </tr>
+        <tr>
+            <th>流失原因：</th>
+            <td colspan="3"><textarea id="lstReason"></textarea></td>
+        </tr>
+        <tfoot>
+            <tr>
+                <td colspan="4">
+                    <input type="button" value="确定" id="btn1" />&nbsp;&nbsp;
+                    <input type="button" value="返回"  id="btn2"/>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

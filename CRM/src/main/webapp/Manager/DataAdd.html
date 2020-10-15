@@ -1,0 +1,68 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript">
+       $(function() {
+		$("#btn2").click(function() {
+			location.href="/findBaseDict";
+		});
+		$("#btn1").click(function(){
+			$.ajax({
+				type:"post",
+				url:"/dataAdd",
+				data:{
+					"dictType":$("#dictType").val(),
+					"dictItem":$("#dictItem").val(),
+					"dictValue":$("#dictValue").val(),
+					"dictIsEditable":$("#dictIsEditable").is(':checked')?"1":"0"
+				},
+				async:true,
+				success:function(){
+					location.href="/findBaseDict";
+				}
+			});
+		});
+	});
+    </script>
+</head>
+<body>
+    <table class="tableEdit">
+        <thead>
+            <tr>
+                <td colspan="4">新建数据字典条目</td>
+            </tr>
+        </thead>
+        <tr>
+            <th>类别：</th>
+            <td>
+                <select id="dictType">    
+                    <option>客户等级</option>
+                    <option>服务类型</option>
+                    <option>地区</option>
+                </select>
+            </td>
+            <th>条目：</th>
+            <td>
+                <input type="text" id="dictItem"/>
+            </td>
+        </tr>
+        <tr>
+            <th>值：</th>
+            <td><input type="text"  id="dictValue" /></td>
+            <th>是否编辑：</th>
+            <td><input type="checkbox" id="dictIsEditable" /></td>
+        </tr>
+        <tfoot>
+            <tr>
+                <td colspan="4">
+                    <input type="button" value="确定" id="btn1"/>&nbsp;&nbsp;
+                    <input type="button" value="返回"  id="btn2"/>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

@@ -1,0 +1,76 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript">
+      $(function(){
+		$("#btn2").click(function(){
+			location.href="/findActList/[[${session.c.custNo}]]";
+		});
+		$("#btn1").click(function(){
+			if($("#atvDates")==""){
+				alert("交往时间不能为空！");
+				return false;
+			}
+			if($("#atvPlace")==""){
+				alert("交往地点不能为空！");
+				return false;
+			}
+			if($("#atvTitle")==""){
+				alert("概要不能为空！");
+				return false;
+			}
+			var form=$("#myForm").serialize();
+			$.get('/addAtvty',form,function(falg){
+				if(falg=="true"){
+                    alert("添加成功！");
+                    location.href="/findActList/[[${session.c.custNo}]]";
+				}else{
+					alert("添加失败！");
+				}
+			});
+
+		});
+	});
+    </script>
+</head>
+<body>
+<form id="myForm">
+    <table class="tableEdit">
+        <thead>
+            <tr>
+                <td colspan="4">新建客户来往记录</td>
+            </tr>
+        </thead>
+        <tr>
+            <th>交往时间：</th>
+            <td>
+                <input type="date" id="atvDates" name="atvDates" th:value="${#dates.format(new java.util.Date().getTime(),'yyyy-MM-dd')}"/>
+            </td>
+            <th>交往地点：</th>
+            <td>
+                <input type="text" id="atvPlace" name="atvPlace" />
+            </td>
+        </tr>
+        <tr>
+            <th>概要：</th>
+            <td><input type="text" id="atvTitle" name="atvTitle" /></td>
+        </tr>
+        <tr>
+            <th>详细描述：</th>
+            <td colspan="3"><textarea name="atvDesc"></textarea></td>
+        </tr>
+        <tfoot>
+            <tr>
+                <td colspan="4">
+                    <input type="button" value="确定" id="btn1" />&nbsp;&nbsp;
+                    <input type="button" value="关闭" id="btn2" />
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+ </form>    
+</body>
+</html>

@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript">
+      $(function(){
+		$("#btn2").click(function(){
+			location.href="/selCustomer";
+		});
+	  $("#btn1").click(function(){
+		if($("#custName").val()==""){
+			alert("客户姓名不能为空！");
+		}
+		var form=$("#myForm").serialize();
+		$.ajax({
+			type:"POST",
+			url:"/updateCus",
+			data:form,
+			async:true,
+			success:function(falg){
+				if(falg=="true"){
+					alert("保存成功！");
+					location.href="/selCustomer";
+				}else{
+					alert("保存失败！");
+				}		
+			}
+		});
+	});
+});
+</script>
+</head>
+<body>
+<form id="myForm">
+<table class="tableEdit">
+        <thead>
+            <tr>
+                <td colspan="4">客户基本信息</td>
+            </tr>
+        </thead>
+        <tr>
+            <th>客户编号：</th>
+            <td><input type="hidden" id="custNo" name="custNo" th:value="${cus.custNo}"/> [[${cus.custNo}]]</td>
+            <th>客户经理：</th>
+            <td>[[${cus.custManagerName}]]
+            </td>
+        </tr>
+        <tr>
+            <th>客户名称：</th>
+            <td>
+                <input type="text" id="custName" name="custName" th:value="${cus.custName}"/>
+             </td>
+            <th>地区：</th>
+            <td>
+                <select id="custRegion" name="custRegion">
+                    <option th:each="r,stat:${session.regionList}" th:value="${r.dictItem}" th:text="${r.dictItem}" th:selected="${cus.custRegion} eq ${r.dictItem}"></option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>客户等级：</th>
+            <td>
+                <select id="custLevel" name="custLevel">
+                    <option th:each="l,stat:${session.levelList}" th:value="${l.dictId}" th:selected="${cus.custLevel} eq ${l.dictId}">[[${l.dictItem}]]</option>
+                </select>
+             </td>
+            <th></th><td></td>
+        </tr>
+        <tr>
+            <th>客户满意度：</th>
+            <td>
+                <select id="custSatisfy" name="custSatisfy">
+                    <option value="1" th:selected="${cus.custSatisfy}==1">☆</option>
+                    <option value="2" th:selected="${cus.custSatisfy}==2">☆☆</option>
+                    <option value="3" th:selected="${cus.custSatisfy}==3">☆☆☆</option>
+                    <option value="4" th:selected="${cus.custSatisfy}==4">☆☆☆☆</option>
+                    <option value="5" th:selected="${cus.custSatisfy}==5">☆☆☆☆☆</option>
+                </select>
+             </td>
+            <th>客户信用度：</th>
+            <td>
+                <select id="custCredit" name="custCredit">
+                    <option value="1"  th:selected="${cus.custCredit}==1">☆</option>
+                    <option value="2" th:selected="${cus.custCredit}==2">☆☆</option>
+                    <option value="3" th:selected="${cus.custCredit}==3">☆☆☆</option>
+                    <option value="4" th:selected="${cus.custCredit}==4">☆☆☆☆</option>
+                    <option value="5" th:selected="${cus.custCredit}==5">☆☆☆☆☆</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+    <p></p>
+    <table class="tableEdit">
+        <thead>
+            <tr>
+                <td colspan="4">客户联系信息</td>
+            </tr>
+        </thead>
+        <tr>
+            <th>地址：</th>
+            <td>
+                <input type="text" style="width:300px" id="custAddr" name="custAddr" th:value="${cus.custAddr}" />
+            </td>
+            <th>邮编：</th>
+            <td>
+                <input type="text" id="custZip" name="custZip" th:value="${cus.custZip}"/>
+            </td>
+        </tr>
+        <tr>
+            <th>电话：</th>
+            <td>
+                <input type="text" id="custTel" name="custTel" th:value="${cus.custTel}" />
+            </td>
+            <th>传真：</th>
+            <td>
+                <input type="text"  id="custFax" name="custFax" th:value="${cus.custFax}"/>
+            </td>
+        </tr>
+        <tr>
+            <th>网址：</th>
+            <td>
+                <input type="text" id="custWebsite" name="custWebsite" th:value="${cus.custWebsite}" />
+            </td>
+            <th></th><td></td>
+        </tr>
+    </table>
+    <p></p>
+    <table class="tableEdit">
+        <thead>
+            <tr>
+                <td colspan="4">公司信息</td>
+            </tr>
+        </thead>
+        <tr>
+            <th>营业执照号：</th>
+            <td>
+                <input type="text" id="custLicenceNo" name="custLicenceNo" th:value="${cus.custLicenceNo}"/>
+            </td>
+            <th>法人：</th>
+            <td>
+                <input type="text" id="custChieftain" name="custChieftain" th:value="${cus.custChieftain}"/>
+            </td>
+        </tr>
+        <tr>
+            <th>注册资金(万元)：</th>
+            <td>
+                <input type="text"  id="custBankroll" name="custBankroll" th:value="${cus.custBankroll}"/>
+            </td>
+            <th>年营业额：</th>
+            <td>
+                <input type="text" id="custTurnover" name="custTurnover" th:value="${cus.custTurnover}"/>
+            </td>
+        </tr>
+        <tr>
+            <th>开户银行：</th>
+            <td>
+                <input type="text" id="custBank" name="custBank" th:value="${cus.custBank}"/>
+            </td>
+            <th>银行账号：</th>
+            <td>
+                <input type="text" id="custBankAccount" name="custBankAccount" th:value="${cus.custBankAccount}"/>
+            </td>
+        </tr>
+        <tr>
+            <th>地税登记号：</th>
+            <td>
+                <input type="text" id="custLocalTaxNo" name="custLocalTaxNo" th:value="${cus.custLocalTaxNo}"/>
+            </td>
+            <th>国税登记号：</th>
+            <td>
+                <input type="text" id="custNationalTaxNo" name="custNationalTaxNo" th:value="${cus.custNationalTaxNo}"/>
+            </td>
+        </tr>
+    </table>
+    <p></p>
+ </form>   
+    <input type="button" value="保存" id="btn1"/>&nbsp;&nbsp;
+    <input type="button" value="返回" id="btn2"/>
+</body>
+</html>

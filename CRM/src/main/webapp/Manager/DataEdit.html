@@ -1,0 +1,70 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript">
+      $(function() {
+    	 
+		$("#btn2").click(function(){
+			location.href="/findBaseDict";
+		});
+		$("#btn1").click(function(){
+			 //$("#dictIsEditable").attr("checked")=="checked"?alert("1"):alert("2");
+			$.ajax({
+				type:"post",
+				url:"/update",
+				data:{
+                    "dictId":[[${baseDict.dictId}]],
+					"dictType":$("#dictType").val(),
+					"dictItem":$("#dictItem").val(),
+					"dictValue":$("#dictValue").val(),
+					"dictIsEditable":$("#dictIsEditable").is(':checked')?"1":"0"},
+				async:true,
+				success:function(){
+					location.href="/findBaseDict";
+				}
+			});
+		});
+	});
+    </script>
+</head>
+<body>
+    <table class="tableEdit">
+        <thead>
+            <tr>
+                <td colspan="4">数据字典条目编辑</td>
+            </tr>
+        </thead>
+        <tr>
+            <th>类别：</th>
+            <td>
+                <select th:value="${baseDict.dictType}" name="dictType" id="dictType">
+                    <option th:selected="${baseDict.dictType=='服务类型'}" value="服务类型">服务类型</option>
+                    <option th:selected="${baseDict.dictType=='客户等级'}" value="客户等级">客户等级</option>
+                    <option th:selected="${baseDict.dictType=='地区'}" value="地区">地区</option>
+                </select>
+            </td>
+            <th>条目：</th>
+            <td>
+                <input type="text" th:value=${baseDict.dictItem}  name="dictItem" id="dictItem"/>
+            </td>
+        </tr>
+        <tr>
+            <th>值：</th>
+            <td><input type="text" th:value=${baseDict.dictValue} name="dictValue" id="dictValue" /></td>
+            <th>是否编辑：</th>
+            <td><input type="checkbox" checked="checked"  id="dictIsEditable"  name="dictIsEditable" value="2"/></td>
+        </tr>
+        <tfoot>
+            <tr>
+                <td colspan="4">
+                    <input type="button" value="确定" id="btn1" />&nbsp;&nbsp;
+                    <input type="button" value="返回" id="btn2" />
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

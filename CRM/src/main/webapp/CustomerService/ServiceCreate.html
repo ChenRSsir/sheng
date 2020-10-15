@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript">
+       $(function(){
+		$("#btn1").click(function(){
+			if($("#svrCustName").val()==""){
+				alert("客户姓名不能为空");
+				return false;
+			}
+			if($("#svrTitle").val()==""){
+				alert("服务概要不能为空");
+				return false;
+			}
+			if($("#svrRequest").val()==""){
+				alert("详细信息不能为空");
+				return false;
+			}
+			//提交
+			var form=$("#myForm").serialize();
+			$.post('/addCstService',form,function(falg){
+				if(falg=="true"){
+					alert("添加成功！");
+					//清空表单
+					$("form")[0].reset();
+				}else{
+					alert("添加失败！");
+				}
+			});
+		});
+	});
+    </script>
+</head>
+<body>
+<form id="myForm" name="myForm">
+<table class="tableEdit" style="width:600px;">
+        <thead>
+            <tr>
+                <td colspan="4">创建服务</td>
+            </tr>
+        </thead>
+        <tr>
+            <th>客户姓名：</th>
+            <td>
+                <input type="text" id="svrCustName" name="svrCustName" /></td>
+            <th>服务类型：</th>
+            <td>
+                <select style="width:100px" name="svrType">
+                    <option th:each="i,stat:${item}" th:value="${i.dictItem}">[[${i.dictItem}]]</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>服务概要：</th>
+            <td colspan="3">
+                <input type="text"  style="width:300px" id="svrTitle" name="svrTitle"/>
+             </td>
+        </tr>
+        <tr>
+            <th>详细信息：</th>
+            <td colspan="3">
+                <textarea id="svrRequest" name="svrRequest"></textarea>
+             </td>
+        </tr>
+        <tfoot>
+            <tr>
+                <td colspan="4">
+                    <input type="button" value="确定" id="btn1" />&nbsp;&nbsp;
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+ </form>   
+</body>
+</html>

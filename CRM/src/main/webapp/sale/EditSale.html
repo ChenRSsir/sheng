@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link href="../CSS/style2.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript">
+       $(function(){
+		//返回
+		$("#btn2").click(function() {
+			location.href="/SalChance";
+		});
+		 //表单验证
+   	 function check() {
+   		 if($("#chcCustName").val()==""){
+				alert("客户名称不能为空！");
+				return false;
+			}
+			if($("#chcRate").val()==""){
+				alert("成功几率不能为空！");
+				return false;
+			}
+			if($("#chcTitle").val()==""){
+				alert("概要不能为空！");
+				return false;
+			}
+			if($("#chcDesc").val()==""){
+				alert("机会描述不能为空！");
+				return false;
+			}
+			//提交
+			var form=$("#myForm").serialize();
+   		$.ajax({
+   			type:"POST",
+				url:"/updateSale?chcId="+[[${salChance.chcId}]],
+				data:form,
+				async:true,
+				success:function(sale){
+					if(sale=="true"){
+						alert("修改成功！");
+						location.href="/SalChance";
+					}else{
+						alert("修改失败！");
+					}
+				}  
+   		});
+	}
+		 $("#btn1").click(function () {
+			 check();
+		});
+});
+    </script>
+</head>
+<body>
+<form id="myForm">
+    <table class="tableEdit">
+        <thead>
+            <tr>
+                <td colspan="4">销售机会编辑</td>
+            </tr>
+        </thead>
+        <tr>
+            <th>客户名称：</th>
+            <td>
+                
+                <input type="text" id="chcCustName" name="chcCustName" th:value="${salChance.chcCustName}" />
+            </td>
+            <th>机会来源</th>
+            <td><input type="text" id="chcSource" name="chcSource" th:value="${salChance.chcSource}"/></td>
+        </tr>
+        <tr>
+            <th>成功几率：</th>
+            <td>
+                <input type="text" id="chcRate" name="chcRate" th:value="${salChance.chcRate}" />
+            </td>
+            <th></th>
+            <td></td>
+        </tr>
+        <tr>
+            <th>联系人：</th>
+            <td><input type="text" id="chcLinkman" name="chcLinkman" th:value="${salChance.chcLinkman}" /></td>
+            <th>联系电话：</th>
+            <td><input type="text" id="chcTel" name="chcTel" th:value="${salChance.chcTel}" /></td>
+        </tr>
+        <tr>
+            <th>概要：</th>
+            <td colspan="3"><input type="text" style="width:500px" th:value="${salChance.chcTitle}" id="chcTitle" name="chcTitle" /></td>
+        </tr>
+        <tr>
+            <th>机会描述：</th>
+            <td colspan="3"><textarea style="width:500px" th:text="${salChance.chcDesc}" id="chcDesc" name="chcDesc"></textarea></td>
+        </tr>
+        <tr>
+            <th>创建人</th>
+            <td><input type="text" readonly="readonly" th:value="${salChance.chcCreateBy}" id="chcCreateBy" name="chcCreateBy" /></td>
+            <th>创建时间</th>
+            <td><input type="text" readonly="readonly" th:value="${#dates.format(salChance.chcCreateDate,'yyyy-MM-dd')}" id="CreateDate" name="CreateDate" /></td>
+        </tr>
+        <tfoot>
+            <tr>
+                <td colspan="4">
+                    <input type="button" value="确定" id="btn1" />&nbsp;&nbsp;
+                    <input type="button" value="返回"  id="btn2" />
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</form>    
+</body>
+</html>
